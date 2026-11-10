@@ -6,7 +6,8 @@
 
 <p align="center"><em>Version 2.2 · Historical cutoff: October 30, 2026 · Research and portfolio project</em></p>
 
-> **Current milestone — Stage 1.2:** Five-source data validation, the isolated fresh-download test, and the complete clean-kernel notebook execution passed on November 9, 2026. The final data-quality assessment is complete. Final documentation/source-rights review and GitHub publication remain open. **The expanded notebook and latest changes have not yet been verified as pushed.**
+> **Current milestone — Stage 1.2:** Five-source data validation, isolated fresh-download testing, and complete clean-kernel notebook execution passed on November 9, 2026. The completed notebook, collection script, dependencies, and documentation were published to GitHub in commit `b699255`. Source-rights and exact replacement-benchmark review remain open as documented limitations.
+
 
 [Research question](#research-question) · [Study design](#study-design) · [Project stages](#project-stage-checklists) · [Verified findings](#verified-data-validation-findings) · [Reproduce](#reproduce-the-data-check) · [Development log](DEVELOPMENT_LOG.md)
 
@@ -90,15 +91,19 @@ Two-page Power BI report + portfolio findings
 - [x] Collect and preserve the five primary market-data snapshots and Cboe VIX reference.
 - [x] Maintain protected raw files and a checksum-based source manifest.
 
+
 ### Stage 1.2 — Data Quality Validation
 
-**Status:** Analytical validation and reproducibility passed locally; final documentation review and GitHub publication pending. **Evidence:** [`01_data_validation.ipynb`](notebooks/01_data_validation.ipynb) (full five-source clean-kernel run passed November 9, 2026; latest version not yet GitHub-verified). [Detailed stage log](DEVELOPMENT_LOG.md#phase-12--data-quality-validation).
+**Status:** Analytical validation and reproducibility completed; published to GitHub in commit `b699255`. Final source-rights review remains open.
+
+**Evidence:** [`01_data_validation.ipynb`](notebooks/01_data_validation.ipynb) (full five-source clean-kernel run passed November 9, 2026). [Detailed stage log](DEVELOPMENT_LOG.md#phase-12--data-quality-validation).
 
 - [x] Validate ETF prices, calendars, corporate actions, extreme returns, and volume anomalies.
 - [x] Check benchmark history and validate VIX against Cboe reference data.
 - [x] Record five-source provenance, restrictions, and methodology in Notebook 01.
 - [x] Verify fresh five-source downloads in isolation and rerun Notebook 01 from a clean kernel.
 - [ ] Review source rights, dependencies, and documentation; commit and verify the GitHub milestone.
+
 
 ### Stage 2 — Exploratory Analysis
 
@@ -165,7 +170,7 @@ Two-page Power BI report + portfolio findings
 
 ## Verified data-validation findings
 
-*The results below were validated locally in Notebook 01. The five-source collection script passed the isolated fresh-download test, and the revised notebook ran successfully from a clean kernel. Publication of these latest changes to GitHub has not yet been verified.*
+*The results below were validated locally in Notebook 01. The five-source collection script passed isolated fresh-download testing, and the revised notebook ran successfully from a clean kernel. The validated work was published to GitHub in commit `b699255`.*
 
 | Finding | Local validation result |
 |---|---|
