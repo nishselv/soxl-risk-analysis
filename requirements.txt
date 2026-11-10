@@ -4,3 +4,4 @@ requests>=2.31,<3
 
 jupyterlab>=4.6,<5
 ipykernel>=7,<8
+matplotlib>=3.10,<4
