@@ -71,8 +71,8 @@ def fetch_etf(ticker: str) -> dict:
 
 def fetch_fred_sox() -> dict:
     print("\nFetching pre-2021 benchmark series NASDAQSOX from FRED...")
-    url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=NASDAQSOX"
-    response = requests.get(url, timeout=40, headers={"User-Agent": "Mozilla/5.0 SOXL-risk-education-project"})
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id=NASDAQSOX&cosd={START}&coed=2026-10-30"
+    response = requests.get(url, timeout=(10, 20))
     response.raise_for_status()
     path = RAW / "nasdaqsox_fred_original.csv"
     path.write_bytes(response.content)

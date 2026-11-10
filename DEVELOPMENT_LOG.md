@@ -40,7 +40,7 @@ Set up a reproducible local development environment and establish a GitHub repos
 
 ### Issue 001 — FRED semiconductor-index request timed out
 
-**Status: Open**
+**Status: Resolved November 9, 2026 (see resolution below)**
 
 - **Observed:** Initial downloads for SOXL, SOXS, and SOXX succeeded, but the FRED `NASDAQSOX` request timed out.
 - **Relevant implementation:** `check_data.py` uses an HTTP request with a 40-second timeout to retrieve a CSV from `fred.stlouisfed.org`.
@@ -70,6 +70,32 @@ Set up a reproducible local development environment and establish a GitHub repos
 **Decision:** Keep `README.md` concise and focused on the research problem, methods, deliverables, status, and eventual findings. Maintain this file as the dated record of work, encountered errors, attempted fixes, verification, and lessons learned. Keep data-source documentation in the planned `data_sources.md` rather than putting every technical detail on the front page.
 
 **Next steps:** Add and commit the redesigned documentation; then return to FRED connectivity and source validation.
+
+---
+
+
+### November 9, 2026 — FRED download issue resolved
+
+**Objective:** Retrieve all four historical data sources successfully.
+
+**What I learned:** FRED stands for Federal Reserve Economic Data. It is a free database maintained by the Federal Reserve Bank of St. Louis. This project uses FRED's NASDAQSOX series for historical semiconductor-market context. NASDAQSOX is not SOXL's exact benchmark throughout the study period.
+
+**Issue:** The original Python request to FRED repeatedly timed out after 40 seconds, although SOXL, SOXS, and SOXX downloaded correctly.
+
+**Investigation:**
+1. Tested FRED using curl with explicit start and end dates. HTTP 200; 79,937 bytes downloaded in approximately 1.31 seconds.
+2. Inspected the CSV, confirming dates from March 1, 2010 through October 30, 2026.
+3. Tested Python requests independently with the same bounded URL. HTTP 200; 79,937 bytes downloaded.
+4. Updated check_data.py to use the date-bounded FRED URL and separate connection/read timeouts.
+5. Reran the complete Python script.
+
+**Verified result:** All four data sources downloaded successfully. The FRED series returned 4,350 records, with zero duplicate dates and zero invalid dates. The script reported `Sources downloaded: 4 | Issues: 0`.
+
+**Conclusion:** The updated request resolved the observed failure. The exact reason for the earlier timeouts remains uncertain. Successful downloading does not yet establish that all market data and adjustments are analytically valid.
+
+**Additional issue:** yfinance displays a deprecation warning concerning `raise_errors`. This did not prevent the downloads and will be addressed separately.
+
+**Next steps:** Verify source coverage, adjusted prices, distributions, split handling, benchmark changes and licensing before modelling.
 
 ---
 

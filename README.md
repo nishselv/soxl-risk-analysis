@@ -79,7 +79,7 @@ Executive summary + documented limitations
 | --- | --- |
 | Local Python environment and initial repository setup | ✅ Complete |
 | Initial SOXL, SOXS, and SOXX data retrieval checks | ✅ Working in initial test; **not yet validated** |
-| FRED `NASDAQSOX` retrieval | ⚠️ Timed out; investigation pending |
+| FRED `NASDAQSOX` retrieval | ✅ Download working; full validation pending |
 | Data-quality checks and documented sources | 🔄 Initial checks exist; full validation pending |
 | PostgreSQL tables and substantive SQL analysis | ⏳ Planned |
 | Walk-forward risk models and uncertainty analysis | ⏳ Planned |
@@ -97,7 +97,7 @@ Executive summary + documented limitations
 - **SOXL, SOXS, SOXX:** initial daily-history retrieval uses `yfinance` (Yahoo Finance data). Split and distribution adjustments require verification before return calculations.
 - **Semiconductor benchmark:** FRED's `NASDAQSOX` series represents the PHLX Semiconductor Sector Index. SOXL's benchmark changed in August 2021, so the FRED series must **not** be presented as its exact benchmark for the entire study period.
 - **Reproducibility:** the ingestion script writes local raw-data snapshots and a `data/manifest.json` with source details and SHA-256 hashes. Raw data are excluded from Git; users retrieve their own copies under the applicable providers' terms.
-- **Availability:** the current FRED request is unresolved. No fallback benchmark will be silently substituted.
+- **Availability:** the date-bounded FRED request now succeeds in the full script. No fallback benchmark will be silently substituted.
 
 Sources: [Direxion fund information](https://www.direxion.com/product/daily-semiconductor-bull-bear-3x-etfs) · [Direxion index-change notice](https://www.direxion.com/uploads/Direxion-Changes-Index-for-Semiconductor-ETFs.pdf) · [FRED NASDAQSOX](https://fred.stlouisfed.org/series/NASDAQSOX) · [yfinance documentation](https://ranaroussi.github.io/yfinance/reference/yfinance.price_history.html)
 
