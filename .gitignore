@@ -1,0 +1,25 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# macOS files
+.DS_Store
+
+# API keys and credentials
+.env
+.env.*
+
+# Downloaded market data
+data/raw/
+data/processed/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Local downloaded data
+data/
+
+# Downloaded starter archives
+*.zip
