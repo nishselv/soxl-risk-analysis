@@ -99,6 +99,76 @@ Set up a reproducible local development environment and establish a GitHub repos
 
 ---
 
+
+### November 9, 2026 — Data quality and trading calendar validation
+
+**Objective:** Check whether the four downloaded datasets contain missing values, invalid prices, duplicate dates, or trading-calendar inconsistencies.
+
+**Initial findings:**
+- SOXL: 4,187 rows, no missing values or invalid dates.
+- SOXS: 4,187 rows, no missing values or invalid dates.
+- SOXX: 4,195 rows, no missing values or invalid dates.
+- FRED NASDAQSOX: 4,350 rows, including 155 missing index values.
+- No duplicate dates or nonpositive observed prices were found.
+
+**Investigation:** Compared FRED's dates with valid index values against SOXX trading dates. Both contained exactly 4,195 dates, with zero unmatched dates.
+
+**What I learned:** Financial datasets may contain dates without market observations because exchanges close for holidays or other non-trading days. Missing values must be investigated before deciding whether to remove or replace them.
+
+**Decision:** Preserve the original FRED source file. Exclude missing-index rows when creating the cleaned trading-day dataset. Do not replace missing prices with zero.
+
+**Remaining validation:** Confirm ETF trading-date alignment, stock splits, adjusted prices, distributions, and benchmark consistency before calculating risk measures.
+
+---
+
+
+### November 9, 2026 — Stock splits and dividend adjustments
+
+**Objective:** Determine whether downloaded ETF prices correctly reflect stock splits and dividend distributions.
+
+**Stock split findings:**
+- SOXL: 2 split events.
+- SOXS: 10 reverse split events.
+- SOXX: 1 split event.
+- Compared Close and Adj Close returns around all 13 recorded split dates.
+- No artificial split-sized price jumps were observed in these returns.
+
+**What I learned:** A stock split changes the number of shares and the price per share without directly changing the total investment value. Split-unadjusted prices can create misleading returns.
+
+**Dividend findings:**
+- SOXL: 32 dividend events.
+- SOXS: 26 dividend events.
+- SOXX: 65 dividend events.
+- Close and Adj Close price levels differed across thousands of historical records.
+- On September 23, 2025, SOXS had a Close return of -0.379% and an adjusted return of +0.689%.
+
+**What I learned:** Dividends are distributions paid to shareholders. Price-only returns can understate investor returns when distributions occur. Adjusted Close incorporates historical distribution adjustments.
+
+**Methodology decision:** Use Adj Close for the main historical return and risk calculations, subject to final validation. Retain Close for price-only analysis and Dividends for separate distribution analysis. Avoid double-counting dividends.
+
+**Remaining checks:** Verify ETF trading-date alignment, investigate extreme returns, independently validate corporate actions, and review historical benchmark consistency.
+
+---
+
+
+### November 9, 2026 — ETF trading-date alignment
+
+**Objective:** Confirm that SOXL, SOXS, and SOXX can be compared on the same trading dates.
+
+**Findings:**
+- All three ETFs share 4,187 trading dates.
+- SOXL and SOXS have identical trading calendars.
+- SOXX has eight additional dates before the other ETFs begin.
+- The common period is March 11, 2010 to October 30, 2026.
+
+**What I learned:** Financial datasets must be aligned by date before comparing returns. Otherwise, an analysis might accidentally compare prices from different trading days.
+
+**Decision:** Use an inner join on trading dates for three-ETF comparisons. Preserve the original datasets and avoid inventing prices for dates without observations.
+
+**Next:** Investigate extreme daily returns to identify possible data errors or genuine market events.
+
+---
+
 ## Upcoming work (Version 2.2)
 
 - [ ] Resolve FRED connectivity and verify benchmark coverage/definitions.
@@ -132,3 +202,27 @@ Set up a reproducible local development environment and establish a GitHub repos
 
 **Next steps:**
 ```
+
+### November 9, 2026 — Migrating analysis to JupyterLab
+
+**Objective:** Establish JupyterLab as the interactive analysis environment for the SOXL Risk Analysis Project.
+
+**Work completed:**
+- Installed JupyterLab and ipykernel in the project virtual environment.
+- Created notebooks/01_data_validation.ipynb.
+- Added Markdown documentation and executable Python cells.
+- Loaded all four historical datasets successfully.
+- Reproduced the missing-value and trading-calendar checks.
+- Verified 4,187 shared ETF trading dates.
+
+**Issue encountered:** The first notebook execution raised a FileNotFoundError because Path.cwd().parent pointed to the Downloads folder instead of the project root.
+
+**Resolution:** Changed the project path to Path.cwd(), then verified that all four CSV files loaded correctly.
+
+**What I learned:** Jupyter combines code, results, and explanations in a reproducible notebook. Python's working directory determines how relative file paths are resolved.
+
+**Workflow decision:** Use JupyterLab for interactive analysis and visualizations, standalone Python scripts for reusable operations, GitHub for version control, README.md for the portfolio overview, and DEVELOPMENT_LOG.md for the full development history.
+
+**Remaining work:** Continue stock split, dividend, and extreme-return validation, including the unusual historical SOXS dividend.
+
+---
