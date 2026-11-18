@@ -4,11 +4,12 @@
 
 **Repository:** [nishselv/soxl-risk-analysis](https://github.com/nishselv/soxl-risk-analysis)\
 **Portfolio overview:** [README.md](README.md)\
-**Primary analysis notebook:** [notebooks/01_data_validation.ipynb](notebooks/01_data_validation.ipynb)\
+**Validation notebook:** [notebooks/01_data_validation.ipynb](notebooks/01_data_validation.ipynb)\
+**Current analysis notebook:** [notebooks/02_exploratory_analysis.ipynb](notebooks/02_exploratory_analysis.ipynb)\
 **Historical data cutoff:** October 30, 2026\
 **Last documented session:** November 18, 2026\
-**Current phase:** 1.2 — Data Quality Validation (**analytical work published; source-rights review remains open**)\
-**Last confirmed analysis commit:** `b699255` — `Complete five-source data validation and reproducibility checks`
+**Current phase:** 2 — Exploratory Analysis (**Sections 2.1–2.4 reviewed; Stage 2 in progress**)\
+**Last confirmed publication baseline:** `4eac145` — `Extend ETF data validation with capital gains checks`
 
 > **Synchronization note (November 9, 2026):** Stage 1.2 analytical work was published to GitHub in verified commit `b699255`, including the expanded five-source notebook, updated collection script, dependencies, README, and development log. The isolated fresh-download test and full five-source clean-kernel notebook run **both passed**. The push to `origin/main` succeeded and the local working tree was clean immediately afterward. README and development-log milestone checklists have been synchronized. The external source-rights and exact replacement-index review remains open; this documentation-only follow-up also requires its own commit.
 
@@ -50,7 +51,7 @@ For every meaningful work session, record the objective, work completed, actual 
 |---|---|---|
 | [1.1 — Project Foundation and Data Acquisition](#phase-11--project-foundation-and-data-acquisition) | Source snapshots + collection script | Foundation operational |
 | [1.2 — Data Quality Validation](#phase-12--data-quality-validation) | [Notebook 01](notebooks/01_data_validation.ipynb) | Analysis published; source-rights review open |
-| [2 — Exploratory Analysis](#phase-2--exploratory-analysis) | `02_exploratory_analysis.ipynb` | Planned |
+| [2 — Exploratory Analysis](#phase-2--exploratory-analysis) | `02_exploratory_analysis.ipynb` | In progress — Sections 2.1–2.4 reviewed |
 | [3 — PostgreSQL and SQL](#phase-3--postgresql-and-sql) | PostgreSQL schema + SQL queries | Planned |
 | [4 — Risk Metrics and Feature Engineering](#phase-4--risk-metrics-and-feature-engineering) | `03_risk_metrics.ipynb` | Planned |
 | [5 — Volatility Modelling](#phase-5--volatility-modelling) | `04_volatility_modeling.ipynb` | Planned |
@@ -226,7 +227,7 @@ These limitations are documented in Notebook 01 and carried forward into future 
 - [ ] Finalize any separate `data_sources.md` (if retained in scope); review licensing references, source redistribution boundaries, and README accuracy. *Source-rights work remains open; raw source data is not being published.*
 - [x] Commit the final notebook, collection script, README, requirements and development log; push and verify GitHub status. *Verified commit `b699255` on `origin/main`; working tree clean after push.*
 
-**Phase status:** **Five-source analytical validation, reproducibility checks, and GitHub publication completed (`b699255`); external source-rights review remains open.** All five primary series have been evaluated, Section 11 is complete, the isolated fresh-download test passed, and the five-source notebook ran from a clean kernel. `requirements.txt` was reviewed against the notebook's reported dependencies. Remaining closeout work: complete the source-rights and exact replacement-index review as appropriate, decide whether to create `data_sources.md`, and commit this documentation-only update. Unresolved third-party sourcing and redistribution restrictions remain explicit limitations; no restricted raw source files have been published.
+**Phase status:** **Five-source analytical validation, reproducibility checks, and GitHub publication completed (latest verified update `4eac145`, November 18, 2026); external source-rights review remains open.** All five primary series have been evaluated, Section 11 is complete, the isolated fresh-download test passed, and the five-source notebook ran from a clean kernel. `requirements.txt` was reviewed against the notebook's reported dependencies. Remaining closeout work: complete the source-rights and exact replacement-index review as appropriate, decide whether to create `data_sources.md`. Unresolved third-party sourcing and redistribution restrictions remain explicit limitations; no restricted raw source files have been published.
 
 ### November 9, 2026 — Initial audit and FRED trading calendar
 
@@ -593,7 +594,9 @@ The capital gains check relies on Yahoo Finance's reported values. It does not i
 - Commit, push, and verify the updated notebook and documentation.
 - Continue with Stage 2 exploratory analysis.
 
-**GitHub status:** Additional validation completed locally. The November 18 changes have not yet been committed or pushed.
+**GitHub status at that checkpoint:** Additional validation completed locally; the November 18 changes had not yet been committed or pushed.
+
+**November 18 publication follow-up:** The revised Notebook 01 and supporting documentation subsequently passed final review and were committed and pushed to `origin/main` in verified commit `4eac145` — `Extend ETF data validation with capital gains checks`. A complete clean-kernel execution of Notebook 01 had passed before publication. This resolves the pending publication status recorded above; the source-rights and exact replacement-index review remain open.
 
 ---
 
@@ -603,30 +606,82 @@ The capital gains check relies on Yahoo Finance's reported values. It does not i
 
 Explore return dynamics, historical volatility, leverage and sector context without fitting the final predictive model.
 
-**Planned deliverable:** `notebooks/02_exploratory_analysis.ipynb`.
+**Deliverable in progress:** `notebooks/02_exploratory_analysis.ipynb` (Sections 2.1–2.4 completed and individually reviewed; final notebook validation pending).
 
 ### Stage milestones — mirrored in README
 
-- [ ] Build date-aligned ETF return and volatility comparisons in Notebook 02.
+- [x] Build date-aligned ETF return and volatility comparisons in Notebook 02.
 - [ ] Explore drawdowns, leverage effects, semiconductor conditions, and VIX relationships.
 - [ ] Document useful visuals and observations without tuning on the 2026 holdout.
 - [ ] Validate, document, commit, and publish Notebook 02.
 
 These milestone checkboxes are intentionally identical to the README. The more detailed task list below records the evidence and smaller steps.
 
-### Detailed work checklist (expand during this phase)
+### Detailed work checklist (evidence and next actions)
 
-- [ ] Inspect adjusted-price returns after applying the 4,187-date inner join; note 1-day return loss from the first aligned observation.
-- [ ] Compare SOXL, SOXS and SOXX return distributions, compounding, volatility clustering, drawdown length and sector-market events.
-- [ ] Explore VIX levels and changes alongside sector realized volatility without implying forecasting power from descriptive charts.
-- [ ] Choose only relevant plots and add interpretation, caveats, and links to Notebook 01 validation decisions.
-- [ ] Restart and Run All; update README + log; verify commit and push before next notebook.
+- [x] Confirm five preserved primary-source checksums and reproduce the 4,187-date ETF alignment without modifying original CSVs.
+- [x] Restrict development EDA to 2010–2019; calculate 2,469 adjusted-price daily returns after the first shared price date.
+- [x] Compare SOXL, SOXS, and SOXX return summaries, distributions, and losses at descriptive -3%, -5%, and -10% thresholds.
+- [x] Calculate 10-day and 20-day rolling daily standard deviations and visualize volatility across ETFs.
+- [x] Examine absolute-return autocorrelation at lags 1, 5, 10, and 20; distinguish it from signed-return autocorrelation.
+- [x] Limit SOXX-relative leverage comparisons to dates after the predecessor IGW period; calculate correlations, descriptive slopes, and illustrative ±3× scatterplots.
+- [x] Calculate SOXX-relative signed and absolute daily leverage deviations and plot their distributions; do not label them official tracking errors.
+- [x] Include worked financial examples, Python explanations, output interpretations, and limitations inside Notebook 02 through Section 2.4.
+- [ ] Investigate historical compounding and path dependence (Section 2.5).
+- [ ] Compare drawdowns and recovery periods (Section 2.6).
+- [ ] Examine semiconductor-sector context using SOXX and NASDAQSOX while respecting benchmark regimes (Section 2.7).
+- [ ] Explore VIX levels and changes alongside sector realized volatility without implying forecasting power from descriptive charts (Section 2.8).
+- [ ] Complete the final research findings, negative results, and limitations (Section 2.9).
+- [ ] Restart and Run All from a clean kernel; reconcile README + log; commit and verify the **completed** Stage 2 publication before moving to the next notebook.
 
-**Phase status:** Not started. No work in this phase has been claimed completed.
+**Phase status:** In progress. Sections 2.1–2.4 completed and their individual Jupyter outputs reviewed on November 18, 2026. Sections 2.5–2.9, the complete fresh-kernel notebook test, and final Stage 2 publication remain outstanding. Today's documentation is an interim checkpoint, not a stage-completion claim.
 
 ### Dated work notes
 
-Add entries here as the phase begins. Record evidence, issues, fixes, interpretation, remaining limitations, and verified commit/push status.
+### November 18, 2026 — Notebook 02: exploratory returns, volatility, and daily leverage checkpoint
+
+**Objective:** Establish reproducible development-period ETF comparisons and investigate historical downside frequencies, changes in volatility, return-magnitude clustering, and approximate daily leverage relationships before fitting any predictive model.
+
+**Work completed:**
+
+- Loaded the five preserved primary datasets, verified **5/5 SHA-256 fingerprints** against the local manifest, and maintained unchanged raw source snapshots.
+- Aligned the ETF prices on **4,187 shared trading dates**. The 2010–2019 development subset contained **2,470 prices** and **2,469 valid daily percentage returns** per ETF; the initial missing return is expected because no preceding aligned price exists.
+- Used `Adj Close` and `pct_change(fill_method=None) * 100` without double-counting distributions. Compared daily mean, median, standard deviation, extrema, quantiles, frequency of negative days, and return histograms.
+- Counted descriptive daily losses of at least **3%, 5%, and 10%**, using overlapping cumulative thresholds rather than exclusive categories.
+- Calculated **10-day (2,460 valid values)** and **20-day (2,450 valid values)** rolling sample standard deviations for each ETF. Visualized SOXL's rolling volatility and same-scale comparisons across the three ETFs.
+- Examined signed versus absolute-return autocorrelation at selected **1-, 5-, 10-, and 20-day lags**; produced tables and a grouped comparison chart.
+- Restricted SOXX-relative leveraged ETF analysis to **October 18, 2010–December 31, 2019** to avoid the IGW predecessor period; used **2,317 matched trading days**.
+- Calculated contemporaneous Pearson correlations, descriptive regression slopes and intercepts, and scatterplots with separately labelled illustrative +3×/-3× reference lines.
+- Calculated signed and absolute daily deviations from illustrative SOXX multiples, including mean deviation, mean absolute deviation, 95th percentile magnitude, and maximum magnitude; plotted signed-deviation histograms.
+- Added financial formulas, numerical examples, Python explanations, chart interpretations, and explicit limitations throughout Notebook 02.
+
+**Verified results:**
+
+| Analysis | Result |
+|---|---|
+| Daily return observations, each ETF | 2,469 (development period) |
+| Return standard deviation | SOXL **4.51%**; SOXS **4.51%**; SOXX **1.49%** |
+| SOXL minimum daily return | **−20.72%** |
+| SOXL daily losses of at least 5% | **261 days / 10.57%** |
+| SOXL daily losses of at least 10% | **51 days / 2.07%** |
+| SOXL absolute-return autocorrelation | Lag 1 **0.1164**; lag 10 **0.1413**; lag 20 **0.0511** |
+| SOXX-relative leverage comparison | **2,317** matched trading days |
+| Correlation with SOXX | SOXL **+0.9980**; SOXS **−0.9979** |
+| SOXX-relative regression slope | SOXL **+3.0056**; SOXS **−3.0085** |
+| Mean absolute SOXX-relative deviation | SOXL **0.1878 pp**; SOXS **0.1986 pp** |
+| Maximum absolute SOXX-relative deviation | SOXL **2.3481 pp**; SOXS **2.0993 pp** |
+
+**Interpretation:** The leveraged ETFs experienced substantially greater daily percentage variation than SOXX. Historical rolling volatility changed over time. Positive autocorrelation in absolute returns at the selected lags was consistent with weak return-magnitude clustering, but did not establish forecasting performance. Strong same-day correlations and near-±3 regression slopes described the leveraged/inverse sector relationships, while daily deviations showed that individual observed returns were not exact multiples of SOXX.
+
+**Concepts and methodology learned:** Daily return versus cumulative growth; loss frequency versus severity; distribution tails and quantiles; percentage changes versus percentage-point differences; sample standard deviation and rolling-window warm-up; absolute returns and lagged autocorrelation; Pearson correlation versus regression slope/intercept; SOXX-relative reference deviation versus an actual benchmark tracking error.
+
+**Important limitations and decisions:** This is descriptive analysis only, not a trained forecasting model. SOXX is an unleveraged sector comparison, not necessarily the exact historical leveraged-fund benchmark. The pre-October 15, 2010 SOXX dataset reflects predecessor IGW history, so the leverage comparison starts October 18. The 2020–2025 evaluation and January–October 2026 final modelling holdout were not used for model design or exploratory tuning. No formal autocorrelation significance testing or predictive evaluation has been claimed. Provider licensing, source validity, and exact replacement-benchmark sourcing remain open as previously documented.
+
+**Verification:** Individual Jupyter cells, output tables, and visualizations through Section 2.4 were reviewed. A full Notebook 02 **Restart and Run All** from a clean kernel has **not** yet been performed. The notebook is therefore not a completed published Stage 2 milestone.
+
+**Next session:** Resume at **2.5 — Compounding and Path Dependence**, then Sections 2.6 (drawdowns), 2.7 (sector context), 2.8 (VIX), and 2.9 (final results, clean-kernel validation, documentation and publication).
+
+**GitHub status at preparation of this entry:** This is a local Stage 2 progress checkpoint; commit and push verification remain pending. Do not mark the Stage 2 publication milestone `[x]` for this interim checkpoint.
 
 ---
 
