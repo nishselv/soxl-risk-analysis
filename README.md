@@ -170,7 +170,9 @@ Two-page Power BI report + portfolio findings
 
 ## Verified data-validation findings
 
-*The results below were validated locally in Notebook 01. The five-source collection script passed isolated fresh-download testing, and the revised notebook ran successfully from a clean kernel. The validated work was published to GitHub in commit `b699255`.*
+
+*The original five-source validation and reproducibility checks were published in commit `b699255` on November 9, 2026. Additional capital gains validation was completed on November 18, 2026, and the updated notebook passed a clean-kernel execution test. These latest changes are pending GitHub publication.*
+
 
 | Finding | Local validation result |
 |---|---|
@@ -178,6 +180,7 @@ Two-page Power BI report + portfolio findings
 | SOXX / valid `NASDAQSOX` calendar | **4,195** matching dates; the original FRED file includes **155** non-observed days |
 | Stock splits | **13 / 13** dates and ratios match reference records (**6** labelled primary-source, **7** secondary-source) |
 | Adjusted-price returns | Internally consistent with the tested dividend-adjustment convention; not independent price authentication |
+| Capital gains distributions | All **12,569** SOXL, SOXS, and SOXX observations checked; **0** missing/invalid values and **0** reported non-zero distributions (additional validation November 18, 2026). |
 | SOXS volume anomaly | **1,986** zero-volume observations, **1,976** with changing closing prices; early volume restricted |
 | VIXCLS | **4,350** FRED rows, **122** missing values; valid on all **4,187** common ETF dates |
 | VIX versus Cboe | **0.00** maximum closing-level difference across the common ETF dates |
@@ -204,10 +207,13 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python check_data.py
+cd notebooks
 jupyter lab
 ```
 
-Open [`notebooks/01_data_validation.ipynb`](notebooks/01_data_validation.ipynb) in JupyterLab, use the project root as the working directory, and run cells in order. The original validated source snapshots are **not** included in Git: `check_data.py` downloads missing primary files and reuses existing ones. Notebook 01 also retrieves or reuses the separate Cboe VIX reference for cross-provider validation. Review the manifest, errors, and notebook checks rather than assuming every provider request succeeded.
+Open `01_data_validation.ipynb` in JupyterLab and run the cells in order. The notebook expects the working directory to be `notebooks/` and locates the raw datasets one directory above it, under `data/raw/`.
+
+The original validated source snapshots are not included in Git. `check_data.py` downloads missing primary files and reuses existing ones. Notebook 01 also retrieves or reuses the separate Cboe VIX reference for cross-provider validation. Review the manifest, errors, and notebook checks rather than assuming every provider request succeeded.
 
 The updated collection script successfully downloaded all five primary datasets in an isolated, empty temporary directory without changing the original validated snapshots. The full notebook also ran from a fresh kernel in the project's existing environment. **Installation and end-to-end notebook execution in an entirely new environment have not been independently tested.** Fresh downloads may differ from the preserved validated files if providers revise historical data.
 

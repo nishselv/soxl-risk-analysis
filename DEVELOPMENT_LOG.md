@@ -6,7 +6,7 @@
 **Portfolio overview:** [README.md](README.md)\
 **Primary analysis notebook:** [notebooks/01_data_validation.ipynb](notebooks/01_data_validation.ipynb)\
 **Historical data cutoff:** October 30, 2026\
-**Last documented session:** November 9, 2026\
+**Last documented session:** November 18, 2026\
 **Current phase:** 1.2 — Data Quality Validation (**analytical work published; source-rights review remains open**)\
 **Last confirmed analysis commit:** `b699255` — `Complete five-source data validation and reproducibility checks`
 
@@ -536,6 +536,64 @@ This was compared against:
 **Remaining limitations:** Publication confirms version control and reproducibility checks, not full independent authentication of prices, unrestricted redistribution rights, or exact replacement-index availability. Source-rights review remains open; no new modelling results are claimed.
 
 **Documentation closeout:** The README now reports the verified analysis commit. This log update records that publication and must itself be committed separately. The shared Stage 1.2 combined rights-review/publication milestone stays unchecked until its outstanding review is resolved.
+
+
+### November 18, 2026 — Additional capital gains validation and notebook path correction
+
+**Objective**
+
+Address an additional data-quality concern identified during an external review of Notebook 01 before beginning Stage 2.
+
+**Issue 1 — Capital gains distributions**
+
+The original validation examined ETF dividends, stock splits, and adjusted closing prices, but did not explicitly test the `Capital Gains` column. Capital gains distributions can affect an ETF's share price and may create misleading returns if they are not properly accounted for.
+
+**Investigation and method**
+
+Added Section 4.7 to `01_data_validation.ipynb`. The new check examines the preserved SOXL, SOXS, and SOXX datasets, converts reported capital gains values to numeric form, counts missing or invalid observations, and identifies non-zero distributions.
+
+**Verified results**
+
+| ETF | Observations | Missing/Invalid | Non-Zero Capital Gains |
+|---|---:|---:|---:|
+| SOXL | 4,187 | 0 | 0 |
+| SOXS | 4,187 | 0 | 0 |
+| SOXX | 4,195 | 0 | 0 |
+| **Total** | **12,569** | **0** | **0** |
+
+All reported capital gains values were zero. No additional distribution dates require adjustment-related investigation based on this field.
+
+The findings support the existing decision to calculate ETF returns using `Adj Close`, alongside the previously completed dividend and corporate-action checks.
+
+**Issue 2 — Jupyter working-directory error**
+
+Reopening Notebook 01 produced a `FileNotFoundError` because the initial loading code assumed that Jupyter was running from the project root. The notebook was instead executing from the `notebooks/` directory, causing Python to look for `notebooks/data/raw/`.
+
+**Resolution**
+
+Updated the project-root path to use `Path.cwd().parent` when executing from `notebooks/`. The original CSV files were located successfully, and the additional capital gains validation ran without errors.
+
+This path convention assumes execution from the `notebooks/` directory.
+
+**Concepts learned**
+
+- Capital gains distributions are separate from ordinary ETF price movements and should be considered when validating historical returns.
+- A zero distribution count means no distributions were reported in the source files; it does not independently prove that none occurred.
+- `Path.cwd()` identifies the current working directory, while `.parent` moves one directory above it.
+- Jupyter's working directory determines how relative file paths are interpreted.
+
+**Limitations**
+
+The capital gains check relies on Yahoo Finance's reported values. It does not independently authenticate the source's complete corporate-action history or every adjusted price. Source redistribution rights and exact replacement-benchmark sourcing remain unresolved.
+
+**Next steps**
+
+- Rerun the revised Notebook 01 from a clean kernel.
+- Review and synchronize the README and development log.
+- Commit, push, and verify the updated notebook and documentation.
+- Continue with Stage 2 exploratory analysis.
+
+**GitHub status:** Additional validation completed locally. The November 18 changes have not yet been committed or pushed.
 
 ---
 
