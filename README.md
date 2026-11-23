@@ -6,7 +6,8 @@ Python · Jupyter · PostgreSQL · SQL · Statistical modelling · Power BI
 
 **Version 2.2** · Historical cutoff: **October 30, 2026** · Research and portfolio project
 
-**Current milestone — Stage 2: Exploratory Analysis (in progress).** Sections 2.1–2.4 of `notebooks/02_exploratory_analysis.ipynb` were completed and reviewed on November 18, 2026. Work to date covers aligned daily ETF returns, return distributions, historical volatility, volatility clustering, and SOXX-relative daily leverage relationships. Compounding, drawdowns, sector/VIX analysis, and final notebook reproducibility checks remain outstanding. The latest verified Stage 1.2 validation update was published in commit `4eac145`. Source-rights and exact replacement-benchmark review remain open.
+**Current milestone — Stage 2: Exploratory Analysis (analytical work complete; publication pending).** Sections 2.1–2.9 of `notebooks/02_exploratory_analysis.ipynb` have been completed and individually reviewed. The notebook covers historical ETF returns, volatility clustering, daily leverage, compounding, drawdowns and recovery, semiconductor-sector relationships, and VIX analysis. The full notebook has also been rerun from a clean kernel. Final documentation reconciliation and GitHub publication remain outstanding. The latest confirmed Stage 2 publication checkpoint is `283894d`. Source-rights and exact replacement-benchmark review remain open.
+
 
 [Research question](#research-question) · [Study design](#study-design) · [Project stages](#project-stage-checklists) · [Verified findings](#verified-data-validation-findings) · [Stage 2 progress](#exploratory-analysis--stage-2-progress) · [Reproduce](#reproduce-the-data-check) · [Development log](DEVELOPMENT_LOG.md)
 
@@ -102,11 +103,15 @@ Two-page Power BI report + portfolio findings
 
 ### Stage 2 — Exploratory Analysis
 
-**Status:** **In progress.** Sections 2.1–2.4 completed and individually reviewed on November 18, 2026; Sections 2.5–2.9 and final clean-kernel verification pending. Notebook: [`02_exploratory_analysis.ipynb`](notebooks/02_exploratory_analysis.ipynb). [Detailed stage log](DEVELOPMENT_LOG.md#phase-2--exploratory-analysis).
+
+**Status:** Analytical work completed and clean-kernel execution verified on November 22, 2026. Final documentation and GitHub publication pending.
+
+**Notebook:** [`02_exploratory_analysis.ipynb`](notebooks/02_exploratory_analysis.ipynb). [Detailed stage log](DEVELOPMENT_LOG.md#phase-2--exploratory-analysis).
+
 
 - [x] Build date-aligned ETF return and volatility comparisons in Notebook 02.
-- [ ] Explore drawdowns, leverage effects, semiconductor conditions, and VIX relationships.
-- [ ] Document useful visuals and observations without tuning on the 2026 holdout.
+- [x] Explore drawdowns, leverage effects, semiconductor conditions, and VIX relationships.
+- [x] Document useful visuals and observations without tuning on the 2026 holdout.
 - [ ] Validate, document, commit, and publish Notebook 02.
 
 ### Stage 3 — PostgreSQL and SQL
@@ -185,31 +190,54 @@ The original five-source validation and reproducibility checks were published in
 
 **Notebook:** [`notebooks/01_data_validation.ipynb`](notebooks/01_data_validation.ipynb) · **Supporting collection script:** [`check_data.py`](check_data.py) · **Full evidence:** [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md).
 
+
 ## Exploratory analysis — Stage 2 progress
 
-**Status:** Sections 2.1–2.4 completed and reviewed on November 18, 2026. Notebook 02 remains in progress; this is an interim checkpoint, not a completed-stage release.
+**Status:** Analytical work and clean-kernel verification completed November 22, 2026. GitHub publication pending.
 
-The exploratory analysis is restricted to the **2010–2019 development period**. The 2020–2025 walk-forward evaluation and 2026 final modelling holdout have not been used for exploratory model selection.
+Notebook 02 examines historical SOXL downside risk using the **2010–2019 development period**. No 2020–2025 walk-forward evaluation or 2026 final-holdout outcomes were used for exploratory model selection.
+
+### Key findings
 
 | Analysis | Verified development-period result |
 |---|---|
-| Aligned daily ETF returns | 2,469 observations per ETF |
-| Daily return standard deviation | SOXL 4.51%; SOXS 4.51%; SOXX 1.49% |
-| SOXL daily losses of at least 5% | 261 of 2,469 days (10.57%) |
-| SOXL daily losses of at least 10% | 51 of 2,469 days (2.07%) |
-| SOXL absolute-return autocorrelation | Lag 1: 0.1164; lag 10: 0.1413 |
-| SOXX-relative leverage comparison | 2,317 matched trading days, October 18, 2010–December 31, 2019 |
-| Same-day correlation with SOXX | SOXL +0.9980; SOXS −0.9979 |
-| Observed SOXX-relative regression slopes | SOXL +3.0056; SOXS −3.0085 |
-| Mean absolute SOXX-relative deviation | SOXL 0.1878 pp; SOXS 0.1986 pp |
+| Daily ETF returns | 2,469 observations per ETF |
+| Daily return standard deviation | SOXL 4.51%; SOXX 1.49% |
+| SOXL daily losses of at least 10% | 51 days (2.07%) |
+| SOXX-relative daily leverage | SOXL slope +3.0056; SOXS slope -3.0085 |
+| SOXL 5-day losses of at least 10% | 11.81% of overlapping historical windows |
+| Hypothetical +3x 20-day median compounding gap | -0.390 percentage points |
+| Maximum historical drawdown | SOXL -72.61%; SOXX -30.50%; SOXS -99.98% |
+| SOXL worst peak-to-recovery duration | 751 trading days |
+| SOXX–NASDAQSOX daily return correlation | +0.9984 |
+| VIX–SOXL realized-volatility correlation | +0.6784 |
+| Daily VIX change–same-day SOXL return correlation | -0.6591 |
 
-Notebook 02 contains daily-return histograms, 10-day/20-day rolling-volatility plots, absolute-return autocorrelation comparisons, leverage scatterplots, and SOXX-relative deviation distributions, alongside explanations and limitations.
+### Research interpretation
 
-**Interpretation:** The leveraged ETFs had substantially wider daily-return distributions than SOXX. Historical realized volatility varied over time, and absolute-return autocorrelations were positive at the selected lags. SOXL and SOXS had strong contemporaneous relationships close to illustrative +3×/−3× SOXX returns, though individual daily deviations occurred.
+The findings demonstrate that SOXL experienced substantial historical downside exposure despite strong cumulative growth over the development period.
 
-**Limitations:** These are descriptive findings, not forecasts. SOXX is a comparison ETF and was not necessarily the leveraged funds' exact historical benchmark. SOXX-relative deviations are not official tracking errors. Correlation or volatility clustering does not establish future predictive utility. The Notebook 02 fresh-kernel test and completed Stage 2 publication are still pending.
+Daily leverage amplified return variation, and compounding produced multi-day outcomes that differed from simple leverage multiples. Severe historical drawdowns sometimes required prolonged recovery.
 
-**Next:** Compounding and path dependence (2.5), drawdowns and recovery (2.6), sector context (2.7), VIX relationships (2.8), and final notebook validation/publication (2.9).
+Semiconductor-sector measures and VIX also exhibited strong historical relationships with relevant market-risk indicators.
+
+However, these findings are **descriptive, not predictive**. Correlation does not establish forecasting power, and the usefulness of VIX beyond semiconductor-sector indicators remains untested.
+
+### Methodological limitations
+
+- Rolling holding periods overlap and are not statistically independent.
+- SOXX is an illustrative sector comparator, not necessarily the leveraged funds' exact historical benchmark.
+- Completed-recovery statistics exclude unresolved drawdown episodes.
+- VIX measures broad-market implied volatility, not semiconductor-specific downside probability.
+- Same-day relationships do not establish predictive information available before market close.
+- The 2010–2019 sample may not represent future market conditions.
+
+Notebook 02 includes annotated Python calculations, mathematical explanations, validation checks, historical tables, and visualizations.
+
+**Reproducibility:** Individual sections and the consolidated integrity audit passed. A full clean-kernel execution was completed before the final documentation update.
+
+**Next:** Finalize documentation, verify GitHub publication, and proceed to Stage 3 — PostgreSQL and SQL.
+
 
 ## Results and dashboard
 
@@ -230,7 +258,7 @@ cd notebooks
 jupyter lab
 ```
 
-Open `01_data_validation.ipynb` in JupyterLab and run the cells in order. Notebook 01 expects the working directory to be `notebooks/` and locates the raw datasets one directory above it, under `data/raw/`. Notebook 02 is an in-progress exploratory notebook; its loading code locates the project root when Jupyter is started from either the root or the `notebooks/` directory.
+Open `01_data_validation.ipynb` in JupyterLab and run the cells in order. Notebook 01 expects the working directory to be `notebooks/` and locates the raw datasets one directory above it, under `data/raw/`. Notebook 02 contains the completed exploratory analysis and has passed a clean-kernel execution test in the existing project environment. Its loading code locates the project root when Jupyter is started from either the root or the `notebooks/` directory.
 
 The original validated source snapshots are not included in Git. `check_data.py` downloads missing primary files and reuses existing ones. Notebook 01 also retrieves or reuses the separate Cboe VIX reference for cross-provider validation. Review the manifest, errors, and notebook checks rather than assuming every provider request succeeded.
 
@@ -243,7 +271,7 @@ Source files are intentionally excluded from GitHub. Financial-provider data may
 | Path | Purpose |
 |---|---|
 | [`notebooks/01_data_validation.ipynb`](notebooks/01_data_validation.ipynb) | Five-source data validation, findings, and limitations |
-| [`notebooks/02_exploratory_analysis.ipynb`](notebooks/02_exploratory_analysis.ipynb) | Exploratory returns, volatility, and leverage analysis (Sections 2.1–2.4 complete; further work pending) |
+| [`notebooks/02_exploratory_analysis.ipynb`](notebooks/02_exploratory_analysis.ipynb) | Completed exploratory analysis covering returns, volatility, daily leverage, compounding, drawdowns, semiconductor-sector context, and VIX relationships (Sections 2.1–2.9; publication pending) |
 | [`check_data.py`](check_data.py) | Local collection and snapshot-protection script |
 | [`DEVELOPMENT_LOG.md`](DEVELOPMENT_LOG.md) | Matching stage checklists, detailed steps, dated evidence, and decisions |
 | [`requirements.txt`](requirements.txt) | Reviewed Python dependencies: pandas, yfinance, requests, JupyterLab, ipykernel, and Matplotlib |

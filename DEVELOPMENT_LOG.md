@@ -7,11 +7,11 @@
 **Validation notebook:** [notebooks/01_data_validation.ipynb](notebooks/01_data_validation.ipynb)\
 **Current analysis notebook:** [notebooks/02_exploratory_analysis.ipynb](notebooks/02_exploratory_analysis.ipynb)\
 **Historical data cutoff:** October 30, 2026\
-**Last documented session:** November 18, 2026\
-**Current phase:** 2 — Exploratory Analysis (**Sections 2.1–2.4 reviewed; Stage 2 in progress**)\
-**Last confirmed publication baseline:** `4eac145` — `Extend ETF data validation with capital gains checks`
+**Last documented session:** November 22, 2026\
+**Current phase:** 2 — Exploratory Analysis (**Sections 2.1–2.9 completed; clean-kernel rerun reported successful; GitHub publication pending**)\
+**Last confirmed publication baseline:** `283894d` — Stage 2 Sections 2.1–2.4 checkpoint
 
-> **Synchronization note (November 9, 2026):** Stage 1.2 analytical work was published to GitHub in verified commit `b699255`, including the expanded five-source notebook, updated collection script, dependencies, README, and development log. The isolated fresh-download test and full five-source clean-kernel notebook run **both passed**. The push to `origin/main` succeeded and the local working tree was clean immediately afterward. README and development-log milestone checklists have been synchronized. The external source-rights and exact replacement-index review remains open; this documentation-only follow-up also requires its own commit.
+> **Historical synchronization note (November 9, 2026):** Stage 1.2 analytical work was published to GitHub in verified commit `b699255`, including the expanded five-source notebook, updated collection script, dependencies, README, and development log. The isolated fresh-download test and full five-source clean-kernel notebook run **both passed**. The push to `origin/main` succeeded and the local working tree was clean immediately afterward. README and development-log milestone checklists have been synchronized. The external source-rights and exact replacement-index review remains open; this documentation-only follow-up also requires its own commit.
 
 ---
 
@@ -51,7 +51,7 @@ For every meaningful work session, record the objective, work completed, actual 
 |---|---|---|
 | [1.1 — Project Foundation and Data Acquisition](#phase-11--project-foundation-and-data-acquisition) | Source snapshots + collection script | Foundation operational |
 | [1.2 — Data Quality Validation](#phase-12--data-quality-validation) | [Notebook 01](notebooks/01_data_validation.ipynb) | Analysis published; source-rights review open |
-| [2 — Exploratory Analysis](#phase-2--exploratory-analysis) | `02_exploratory_analysis.ipynb` | In progress — Sections 2.1–2.4 reviewed |
+| [2 — Exploratory Analysis](#phase-2--exploratory-analysis) | `02_exploratory_analysis.ipynb` | Analysis complete; GitHub publication pending |
 | [3 — PostgreSQL and SQL](#phase-3--postgresql-and-sql) | PostgreSQL schema + SQL queries | Planned |
 | [4 — Risk Metrics and Feature Engineering](#phase-4--risk-metrics-and-feature-engineering) | `03_risk_metrics.ipynb` | Planned |
 | [5 — Volatility Modelling](#phase-5--volatility-modelling) | `04_volatility_modeling.ipynb` | Planned |
@@ -598,24 +598,90 @@ The capital gains check relies on Yahoo Finance's reported values. It does not i
 
 **November 18 publication follow-up:** The revised Notebook 01 and supporting documentation subsequently passed final review and were committed and pushed to `origin/main` in verified commit `4eac145` — `Extend ETF data validation with capital gains checks`. A complete clean-kernel execution of Notebook 01 had passed before publication. This resolves the pending publication status recorded above; the source-rights and exact replacement-index review remain open.
 
+
+### November 22, 2026 — Additional Stale-Price Screening
+
+**Objective:** Identify historical ETF observations where the closing price remained unchanged despite noticeable semiconductor-sector movement.
+
+**Method:**
+
+Added Section 9.9 to `01_data_validation.ipynb`.
+
+Calculated daily percentage returns from the ETF closing prices using `pct_change(fill_method=None)`.
+
+Defined a flat day as an observation where the ETF's closing price was identical to its preceding closing price.
+
+Flagged observations where an ETF was flat while SOXX's daily closing-price return exceeded 0.5% in absolute value.
+
+Converted date fields to pandas datetime format to ensure correct date alignment when mapping SOXX returns.
+
+**Verified results:**
+
+| ETF | Flat Closing-Price Days | Flagged Observations |
+|---|---:|---:|
+| SOXL | 17 | 0 |
+| SOXS | 38 | 2 |
+| SOXX | 15 | 0 |
+
+The two flagged SOXS dates were:
+
+- March 17, 2010: SOXS 0.00%; SOXX +1.6139%.
+- March 18, 2010: SOXS 0.00%; SOXX -0.9248%.
+
+Both observations reported zero SOXS volume.
+
+**Interpretation:**
+
+The flagged dates occurred during SOXS's first week of trading.
+
+The combination of zero reported volume, unchanged closing prices, and noticeable sector movements warrants caution.
+
+However, the screening does not independently establish that either reported price was incorrect.
+
+**Methodological decision:**
+
+Preserve both observations in the original data.
+
+The observations occur before October 18, 2010, so they are excluded from the later SOXX-relative leverage, compounding, drawdown, and sector comparisons.
+
+They remain in the broader 2010–2019 development-period return and volatility calculations. Their exact influence on those statistics has not been separately quantified.
+
+**Concepts learned:**
+
+- A stale price is a reported price that may not reflect current market conditions.
+- An unchanged closing price does not automatically prove a data error.
+- Comparing price changes against a related market instrument can help identify suspicious observations.
+- `.map()` can align a date-indexed reference series with another DataFrame.
+- Datetime consistency matters when matching observations across datasets.
+
+**Limitations:**
+
+The 0.5% threshold is a descriptive screening rule rather than a statistical or regulatory definition of stale pricing.
+
+The cause of the two SOXS observations remains unverified.
+
+**Verification status:** Section 9.9 executed successfully and its output was reviewed. A subsequent complete clean-kernel rerun of the expanded Notebook 01 remains to be confirmed.
+
+**GitHub status:** Changes remain local pending final publication review.
+
 ---
 
 ## Phase 2 — Exploratory Analysis
 
 ### Objective and scope
 
-Explore return dynamics, historical volatility, leverage and sector context without fitting the final predictive model.
+Explore daily ETF returns, historical volatility, leverage relationships, compounding, drawdowns and recovery, semiconductor-sector conditions, and VIX without fitting a predictive model.
 
-**Deliverable in progress:** `notebooks/02_exploratory_analysis.ipynb` (Sections 2.1–2.4 completed and individually reviewed; final notebook validation pending).
+**Deliverable:** `notebooks/02_exploratory_analysis.ipynb` (Sections 2.1–2.9 completed; individual validations and consolidated audit passed; full clean-kernel rerun reported successful on November 22, 2026; final GitHub publication pending).
 
 ### Stage milestones — mirrored in README
 
 - [x] Build date-aligned ETF return and volatility comparisons in Notebook 02.
-- [ ] Explore drawdowns, leverage effects, semiconductor conditions, and VIX relationships.
-- [ ] Document useful visuals and observations without tuning on the 2026 holdout.
+- [x] Explore drawdowns, leverage effects, semiconductor conditions, and VIX relationships.
+- [x] Document useful visuals and observations without tuning on the 2026 holdout.
 - [ ] Validate, document, commit, and publish Notebook 02.
 
-These milestone checkboxes are intentionally identical to the README. The more detailed task list below records the evidence and smaller steps.
+These milestone lines and their checked states match `README.md`. The combined final publication milestone remains unchecked until the GitHub push is verified.
 
 ### Detailed work checklist (evidence and next actions)
 
@@ -626,15 +692,16 @@ These milestone checkboxes are intentionally identical to the README. The more d
 - [x] Examine absolute-return autocorrelation at lags 1, 5, 10, and 20; distinguish it from signed-return autocorrelation.
 - [x] Limit SOXX-relative leverage comparisons to dates after the predecessor IGW period; calculate correlations, descriptive slopes, and illustrative ±3× scatterplots.
 - [x] Calculate SOXX-relative signed and absolute daily leverage deviations and plot their distributions; do not label them official tracking errors.
-- [x] Include worked financial examples, Python explanations, output interpretations, and limitations inside Notebook 02 through Section 2.4.
-- [ ] Investigate historical compounding and path dependence (Section 2.5).
-- [ ] Compare drawdowns and recovery periods (Section 2.6).
-- [ ] Examine semiconductor-sector context using SOXX and NASDAQSOX while respecting benchmark regimes (Section 2.7).
-- [ ] Explore VIX levels and changes alongside sector realized volatility without implying forecasting power from descriptive charts (Section 2.8).
-- [ ] Complete the final research findings, negative results, and limitations (Section 2.9).
-- [ ] Restart and Run All from a clean kernel; reconcile README + log; commit and verify the **completed** Stage 2 publication before moving to the next notebook.
+- [x] Include worked financial examples, Python explanations, output interpretations, and limitations throughout Notebook 02.
+- [x] Investigate historical compounding and path dependence (Section 2.5).
+- [x] Compare drawdowns, recovery durations, and severity categories (Section 2.6).
+- [x] Examine semiconductor-sector context using SOXX and NASDAQSOX while respecting benchmark regimes (Section 2.7).
+- [x] Explore VIX levels and changes alongside sector realized volatility without implying forecasting power from descriptive charts (Section 2.8).
+- [x] Complete the final research findings, negative results, limitations, and integrity audit (Section 2.9).
+- [x] Restart and Run All from a clean kernel in the existing local Jupyter environment (reported complete November 22).
+- [ ] Reconcile documentation, review Git changes, commit, push, and verify completed Stage 2 publication.
 
-**Phase status:** In progress. Sections 2.1–2.4 completed and their individual Jupyter outputs reviewed on November 18, 2026. Sections 2.5–2.9, the complete fresh-kernel notebook test, and final Stage 2 publication remain outstanding. Today's documentation is an interim checkpoint, not a stage-completion claim.
+**Phase status:** Analytical work and individual tests completed; final integrity audit passed on November 22, 2026. The clean-kernel rerun was reported complete by the notebook operator; no separate post-rerun screenshot was supplied. The original November 18 checkpoint below remains intact as a dated historical record. Documentation synchronization and GitHub publication are not yet verified.
 
 ### Dated work notes
 
@@ -682,6 +749,198 @@ These milestone checkboxes are intentionally identical to the README. The more d
 **Next session:** Resume at **2.5 — Compounding and Path Dependence**, then Sections 2.6 (drawdowns), 2.7 (sector context), 2.8 (VIX), and 2.9 (final results, clean-kernel validation, documentation and publication).
 
 **GitHub status at preparation of this entry:** This is a local Stage 2 progress checkpoint; commit and push verification remain pending. Do not mark the Stage 2 publication milestone `[x]` for this interim checkpoint.
+
+---
+
+### November 22, 2026 — Completing Notebook 02: compounding, drawdowns, sector context, and VIX
+
+**Objective:** Complete Sections 2.5–2.9, interpret the outputs, document the main concepts, test internal consistency, and prepare the notebook for its final Stage 2 publication. This continued the published Sections 2.1–2.4 baseline (`283894d`) without changing the original market-data snapshots or the Version 2.2 evaluation plan.
+
+**Scope and data boundary:** Analyses used only the **2010–2019 development period**. SOXX-relative historical comparisons began on **October 18, 2010**, after the SOXX predecessor-history transition. Broader return/VIX comparisons used **March 11, 2010–December 31, 2019**. The 2020–2025 walk-forward period and the **January–October 30, 2026** final modelling holdout remained outside exploratory model selection.
+
+#### Section 2.5 — Compounding and path dependence
+
+**Research question:** Why can daily leveraged funds produce multi-day returns different from simply multiplying the sector's multi-day return by their daily leverage factor?
+
+**Methods and calculations:**
+
+- Added a worked two-day example starting with 100 USD: an underlying +10% day followed by exactly -1/11 (about -9.09%) returns the underlying to 100 USD, while idealized daily +3× and -3× paths finish at about 94.55 USD and 89.09 USD. A flat 0%/0% underlying path finishes at 100 USD for all three. This illustrates that different daily-return *patterns* matter; reversing the same two returns does not change their compounded product.
+- Applied daily growth factors `1 + r` and `cumprod()` to reconstruct SOXX, SOXL, and SOXS investment values from adjusted-price returns. Rebased each series to **100 USD** on October 18, 2010 and deliberately excluded the first day's already-computed return because it refers to the preceding date.
+- Constructed **hypothetical**, costless daily +3× and -3× paths using SOXX returns. These are explanatory sector-relative paths, not simulations of each fund's exact official historical benchmark or realized fund expense structure.
+- Calculated rolling **5-, 10-, and 20-trading-day** returns using `pct_change(periods=h, fill_method=None)`, then compared the hypothetical compounded leveraged return with ±3 times the underlying's cumulative return. Reported the difference in **percentage points (pp)**.
+- Verified actual ETF growth independently against the ratio of adjusted closing prices and checked the first rolling-window products directly with NumPy. Produced logarithmic and linear long-run investment-value plots, a SOXL loss-frequency chart, and median hypothetical compounding-gap comparisons.
+
+**Verified long-run investment values (October 18, 2010–December 31, 2019):**
+
+| Investment | Starting value (USD) | Ending value (USD) | Cumulative return (%) |
+|---|---:|---:|---:|
+| SOXX | 100.00 | 584.3795 | +484.3795 |
+| SOXL | 100.00 | 3,603.9361 | +3,503.9361 |
+| SOXS | 100.00 | 0.0210 | -99.9790 |
+| Hypothetical +3× SOXX daily | 100.00 | 4,462.5645 | +4,362.5645 |
+| Hypothetical -3× SOXX daily | 100.00 | 0.0255 | -99.9745 |
+
+The comparison contained **2,317 matched investment-value dates** and **2,316 daily growth steps**. The hypothetical +3× path finished above actual SOXL, but their difference cannot be labelled official tracking error because underlying benchmark history, fees, financing and other effects are not separately identified.
+
+**Verified rolling holding-period results:**
+
+| Measure | 5 days | 10 days | 20 days |
+|---|---:|---:|---:|
+| Overlapping windows | 2,312 | 2,307 | 2,297 |
+| SOXL median cumulative return (%) | +1.724 | +2.799 | +4.874 |
+| SOXL 10th-percentile return (%) | -11.046 | -14.127 | -18.335 |
+| SOXL windows losing at least 10% (%) | 11.808 | 15.821 | 22.377 |
+| Hypothetical +3× median gap (pp) | -0.038 | -0.153 | -0.390 |
+| Hypothetical -3× median gap (pp) | -0.075 | -0.296 | -0.763 |
+| Hypothetical +3× negative gap frequency (%) | 59.602 | 64.976 | 65.869 |
+| Hypothetical -3× negative gap frequency (%) | 59.516 | 64.239 | 64.432 |
+
+**Interpretation:** The median hypothetical compounding gaps were negative and became more negative across these three horizons. This does **not** mean compounding always hurts: two consecutive +10% benchmark returns yield +69% for idealized daily +3× versus +63% for three times the underlying's +21% cumulative return. SOXL also had material negative multi-day outcomes within a broadly rising historical sector. Rolling windows overlap and do not provide independent probability samples.
+
+**Concepts learned:** Growth factor, product notation, `cumprod()`, cumulative versus summed returns, `pct_change(periods=h)`, initial-date rebaselining, percentage vs percentage points, log axes, hypothetical versus observed leverage, and the distinction between path composition and rearranging identical daily returns.
+
+#### Section 2.6 — Drawdowns, episodes, and recovery
+
+**Research question:** How deeply did the ETFs fall from earlier peaks, and how long did it take to return to those peaks?
+
+**Methods and validation:**
+
+- Computed running peaks with `cummax()`, then daily drawdowns as `100 × (value / running_peak - 1)`; checked the calculations independently using `np.maximum.accumulate()`.
+- Identified each ETF's worst peak, trough, and peak-to-trough duration. A **peak-to-trough interval is not a recovery interval**.
+- Scanned investment values sequentially to detect completed peak-to-peak drawdown episodes and episodes still open at the December 31, 2019 cutoff. Recorded peak, trough, recovery date if observed, depth, and trading-day interval durations.
+- Represented missing recovery dates as `NaT` and missing completed durations as `NaN`. Unrecovered episodes are **right-censored**, not zero-day recoveries.
+- Used `pd.cut()` to classify drawdown loss magnitude: shallow **under 10%**, moderate **10% to under 20%**, and severe **20% or more**. Produced a drawdown-history chart and a scatterplot of substantial **completed** drawdowns by peak-to-recovery duration; validated counts against original episode records.
+
+**Verified maximum drawdown summary:**
+
+| ETF | Maximum drawdown (%) | Previous peak | Trough | Peak-to-trough (trading-day intervals) | Full peak-to-recovery duration |
+|---|---:|---|---|---:|---|
+| SOXX | -30.496 | 2011-02-17 | 2011-08-19 | 127 | 558 trading-day intervals; recovered 2013-05-09 |
+| SOXL | -72.606 | 2011-02-17 | 2011-10-03 | 157 | 751 trading-day intervals; recovered 2014-02-13 |
+| SOXS | -99.980 | 2010-10-19 | 2019-12-26 | 2,312 | Not recovered by cutoff |
+
+**Completed and unresolved episode counts:**
+
+| ETF | Recovered episodes | Episodes open at cutoff | Median completed peak-to-recovery (days) | Longest completed duration (days) |
+|---|---:|---:|---:|---:|
+| SOXX | 107 | 1 | 4.0 | 558 |
+| SOXL | 74 | 1 | 4.5 | 751 |
+| SOXS | 0 | 1 | N/A | N/A |
+
+SOXX and SOXL each had **3 observed trading-day intervals** underwater in their final open episode. SOXS had **2,315** such intervals in its open episode. For SOXS, the completed-recovery median is undefined, not zero.
+
+**SOXL recovery duration by severity:**
+
+| Drawdown category | Total observed episodes | Recovered episodes | Open at cutoff | Median completed recovery (trading-day intervals) | Longest completed recovery |
+|---|---:|---:|---:|---:|---:|
+| Shallow (<10%) | 53 | 52 | 1 | 3.0 | 18 |
+| Moderate (10–<20%) | 10 | 10 | 0 | 15.5 | 40 |
+| Severe (≥20%) | 12 | 12 | 0 | 61.5 | 751 |
+
+SOXX had **3 severe completed** drawdowns (median recovery **285** trading-day intervals); SOXS had **one severe open** episode and none recovered. Across SOXX and SOXL there were **30 substantial completed** episodes (loss ≥10%) in the scatterplot; **three open episodes** were omitted from completed-recovery duration plotting.
+
+**Interpretation and limits:** SOXL's strong full-period cumulative return coexisted with a **-72.61%** maximum drawdown and a **751-trading-day** recovery from its worst historical episode. The overall median of 4.5 completed recovery days is dominated by short, shallow episodes; it should not be presented as a typical recovery time for severe losses. Small subgroup sizes and right-censoring prevent claiming a general recovery-speed advantage for either fund. Historical drawdowns are retrospective and depend on the chosen observation period.
+
+**Concepts learned:** `cummax()`, `idxmin()`, episode state tracking with `if`/`else`, `NaT` versus `NaN`, trading-day intervals versus calendar days, `groupby()`, `pd.cut()`, right-censoring, and why completed-event statistics can be selection-biased.
+
+#### Section 2.7 — Semiconductor-sector context
+
+**Research question:** Do SOXX and FRED NASDAQSOX reflect similar semiconductor-market movements?
+
+**Methods:** Restricted to October 18, 2010–December 31, 2019 (the post-IGW-transition comparison); calculated daily returns separately for SOXX adjusted prices and NASDAQSOX index levels, checked date alignment and first-return warm-up, calculated descriptive statistics and Pearson correlation, normalized each series to 100, and created a historical growth plot plus a same-day return scatterplot with an equality reference. The normalized SOXX series matched the earlier adjusted-price growth calculations.
+
+**Verified results (2,317 price dates; 2,316 valid daily returns):**
+
+| Statistic | SOXX | NASDAQSOX |
+|---|---:|---:|
+| Mean daily return (%) | +0.0869 | +0.0823 |
+| Daily sample standard deviation (%) | 1.460 | 1.481 |
+| Minimum daily return (%) | -6.8920 | -6.8942 |
+| Maximum daily return (%) | +6.0000 | +5.8703 |
+
+- **Same-day Pearson correlation: +0.9984.**
+- **Mean absolute daily return difference: 0.0596 percentage points.**
+- The normalized growth paths broadly aligned but SOXX finished above the NASDAQSOX series in the observed comparison.
+
+**Interpretation:** Both series capture closely related semiconductor-sector movements, but their returns are not identical. SOXX adjusted-price history and NASDAQSOX index levels have different investment/index conventions. The exceptionally high contemporaneous correlation could signal redundant candidate features; it does not alone establish multicollinearity problems in an eventual model, perfect benchmark equivalence, or forecasting usefulness.
+
+**Concepts learned:** Indexing different series to 100, `iloc[0]`, scatterplots against a 45-degree equality line, positive correlation versus equality, and the possibility of overlapping information across predictors.
+
+#### Section 2.8 — VIX relationships
+
+**Research question:** How did broader market implied volatility relate to trailing semiconductor ETF volatility and same-day SOXL returns?
+
+**Methods:** Used the March 11, 2010–December 31, 2019 development period; calculated VIX index-point changes with `diff()`, annualized 20-trading-day realized standard deviation as `rolling(20).std(ddof=1) * sqrt(252)` on **percentage** daily returns, compared VIX with SOXX/SOXL trailing realized volatility, and calculated Pearson correlations of changes in VIX with **same-day** SOXL returns. Built one historical time-series chart and two scatterplots; cross-checked correlations using NumPy.
+
+**Verified sample sizes:** **2,470 VIX observations**, **2,469 daily VIX-change observations**, and **2,450 valid 20-day realized-volatility dates** (first complete trailing-volatility date: 2010-04-09).
+
+**Verified volatility summaries:**
+
+| Measure | Mean | Median | Minimum | Maximum |
+|---|---:|---:|---:|---:|
+| VIX level (index points) | 16.777 | 15.320 | 9.140 | 48.000 |
+| SOXX 20-day annualized realized volatility (%) | 22.473 | 20.583 | 6.635 | 53.966 |
+| SOXL 20-day annualized realized volatility (%) | 67.772 | 61.771 | 19.515 | 161.739 |
+
+**Verified contemporaneous correlations:**
+
+| Relationship | Pearson correlation |
+|---|---:|
+| VIX level versus SOXX trailing 20-day realized volatility | +0.6725 |
+| VIX level versus SOXL trailing 20-day realized volatility | +0.6784 |
+| Daily VIX index-point change versus same-day SOXL return (%) | -0.6591 |
+
+**Interpretation:** Periods with high VIX often coincided with higher realized semiconductor volatility, and increases in VIX were associated with more negative *same-day* SOXL returns. The scatterplots also showed substantial variation around the correlation patterns. VIX is a **roughly 30-calendar-day, forward-looking S&P 500 options-implied volatility measure**, whereas the constructed realized-volatility metrics are **backward-looking 20-trading-day ETF standard deviations**. Their levels and units must not be confused. These results are **not evidence of future predictive power**; same-day VIX information must respect when a forecast can actually be made.
+
+**Concepts learned:** Implied versus realized volatility, square-root-of-252 annualization as an approximation, `diff()` and point changes, rolling warm-up, contemporaneous versus lagged relationships, and strict information-timing controls.
+
+#### Section 2.9 — Synthesis and integrity audit
+
+**Objective:** Summarize the research implications and verify dates, counts, key calculations, and known sample boundaries without crossing into predictive model selection.
+
+**Consolidated findings:** SOXL's daily return dispersion was far greater than SOXX's; losses of **at least 10%** occurred on **51 of 2,469 development days (2.07%)**. Selected absolute-return autocorrelations were positive, consistent with some historical return-magnitude clustering. Observed daily SOXL/SOXS relationships with SOXX were near illustrative ±3× but not identical. Compounding produced multi-day leverage differences; maximum drawdowns and recovery episodes revealed large losses and occasionally long underwater periods. SOXX/NASDAQSOX and VIX provided related sector/broad-market historical context, but no predictive model was fitted or validated.
+
+**Consolidated integrity audit:**
+
+| Audited table | Observations | First date | Last date |
+|---|---:|---|---|
+| Development ETF-aligned prices | 2,470 | 2010-03-11 | 2019-12-31 |
+| Compounding history | 2,317 | 2010-10-18 | 2019-12-31 |
+| Drawdown history | 2,317 | 2010-10-18 | 2019-12-31 |
+| Sector context | 2,317 | 2010-10-18 | 2019-12-31 |
+| Sector daily returns | 2,316 | 2010-10-19 | 2019-12-31 |
+| VIX rolling volatility | 2,450 | 2010-04-09 | 2019-12-31 |
+| VIX daily changes | 2,469 | 2010-03-12 | 2019-12-31 |
+
+All seven datasets passed the audit of expected row counts, date range and unique dates. The rolling 5-, 10-, and 20-day counts, recovered/open episode counts, and previously reviewed drawdown, sector and VIX statistics matched the final section's checks. **No post-2019 dates** appeared in the audited exploratory tables. The final output printed **“All Stage 2 final integrity checks passed.”**
+
+**Clean-kernel reproducibility:** After completing the audit, completion of JupyterLab's **Restart Kernel and Run All Cells** workflow was reported. Individual outputs and the audit were independently reviewed through screenshots before that final rerun. A separate post-rerun screenshot or programmatic inspection of the user's local machine was not performed here, so the complete rerun is recorded as **reported successful in the existing environment**, not as an independently verified fresh-install test.
+
+#### Issues encountered and resolutions
+
+- **Markdown currency formatting:** Unescaped USD dollar signs in Markdown tables and prose were parsed as math delimiters, damaging table and sentence rendering. Replaced literal dollar signs with “USD” in tables and kept LaTeX delimiters only where mathematical notation was intended; screenshots showed the corrected rendering.
+- **Missing warm-up observations:** A first daily return requires a prior price; a 20-day realized-volatility statistic requires 20 valid daily returns. The missing warm-up observations were retained as missing rather than filled with fabricated returns or VIX changes.
+- **Rebasing versus including the starting-date return:** Long-run investment paths begin at 100 on October 18, 2010; therefore the pre-existing daily return at the initial date is not applied. 2,317 price dates produce 2,316 subsequent growth steps.
+- **Unresolved drawdown episodes:** Stored recovery date as `NaT` and completed duration as `NaN` when no recovery was observed by the historical cutoff; open episodes were excluded from completed-recovery scatterplots and medians, while retaining their counts.
+- **Overlapping horizon comparisons:** Recognized that rolling windows share data; descriptive window frequencies were not interpreted as estimates from independent trials.
+
+#### Methods and research decisions carried forward
+
+- Keep original five market-data CSVs and their local checksum manifest unchanged and outside Git.
+- Use adjusted ETF closing-price returns while preserving the earlier source/corporate-action caveats; do not add distributions twice.
+- Respect the SOXX/IGW historical transition and later benchmark changes. Label SOXX-relative ±3× paths **illustrative**, not official fund tracking measurements.
+- Separate return percentage calculations, daily VIX **index-point** changes, and differences in **percentage points**.
+- Interpret overlapping returns, completed recovery observations, and historical market regimes with their sampling limitations.
+- Treat VIX and semiconductor measures as **candidate explanatory variables**; do not infer forecast skill from contemporaneous correlations.
+- Preserve the frozen Version 2.2 design: development **2010–2019**; expanding-window walk-forward evaluation **2020–2025**; untouched final modelling holdout **January–October 30, 2026**. Forecast feature timestamps, any thresholds, and preprocessing must be defined using only information available at the correct forecast time.
+
+#### Open limitations and next steps
+
+Historical source records may be revised; some split/reference records are secondary; early SOXS share volume is not dependable; full source/redistribution rights and exact replacement-benchmark details remain open; some sector comparisons use different index/ETF return definitions. The descriptive sample is limited to 2010–2019, rolling windows overlap, severity categories were chosen for exposition, and unresolved drawdowns are right-censored. There has been **no out-of-sample risk model**, final holdout evaluation, or proof that VIX provides incremental predictive value. End-to-end setup in a brand-new Python environment has not been independently tested.
+
+**Publication status as of this entry:** Notebook 02 Sections 2.1–2.9 and the consolidated audit were completed. README updates were prepared and the matching Stage 2 checklists were set to three checked milestones, with publication unchecked. The most recent previously confirmed published Stage 2 checkpoint remains **`283894d`**. The final Notebook 02 + README + `DEVELOPMENT_LOG.md` commit/push has **not** been verified, so no new commit hash is asserted.
+
+**Next actions:** Compare the current notebook and documentation against Git, inspect staged changes and untracked files, check that raw market snapshots are not tracked, commit the finished Stage 2 files with a descriptive title and body, push to `origin/main`, and verify local/remote status. Only then update the final Stage 2 publication milestone in both README and this log to `[x]`, and begin Stage 3 — PostgreSQL and SQL.
 
 ---
 
